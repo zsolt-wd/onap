@@ -1,0 +1,11 @@
+# Add to the /etc/exports file on the nfs server
+nfs_export:
+  path: "/dockerdata-nfs"
+  options: "*(rw,no_root_squash,no_subtree_check)"
+
+# Add to the /etc/fstab file on the 
+nfs_mount:
+  local_path: "/dockerdata-nfs"
+  remote_path: "/dockerdata-nfs"
+  server_host: "{{ hostvars[groups['master'][0]]['ansible_default_ipv4']['address'] }}"
+  fstype: "nfs"

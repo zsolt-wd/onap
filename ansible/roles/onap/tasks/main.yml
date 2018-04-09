@@ -1,0 +1,12 @@
+---
+- name: Ensure nfs-utils package is installed.
+  yum:
+    name: nfs-utils
+    state: present
+
+- include_tasks: nfs-server.yml
+  when: inventory_hostname in groups['master']
+
+- include_tasks: nfs-client.yml
+  when: inventory_hostname in groups['nodes']
+

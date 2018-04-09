@@ -1,0 +1,19 @@
+---
+- name: Ensure mount point exists
+  file:
+    path: "{{ nfs_mount['local_path'] }}"
+    state: directory
+    mode: 0777
+
+- name: Add nfs mount to /etc/fstab
+  lineinfile:
+    path: /etc/fstab
+    regexp: "^{{ nfs_mount['server_host'] }}"
+    line: "{{ nfs_mount['server_host'] }}:{{ nfs_mount['remote_path'] }} {{ nfs_mount['local_path'] }} {{ nfs_mount['fstype'] }} defaults 0 0"
+
+- name: Mount nfs filesystem.
+  mount:
+    src: "{{ nfs_mount['server_host'] }}:{{ nfs_mount['remote_path'] }}"
+    fstype: "{{ nfs_mount['fstype'] }}" 
+    path: "{{ nfs_mount['local_path'] }}"
+    state: mounted
