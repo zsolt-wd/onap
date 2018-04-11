@@ -10,3 +10,8 @@
 - include_tasks: nfs-client.yml
   when: inventory_hostname in groups['nodes']
 
+- include_tasks: rancher-server.yml
+  when: inventory_hostname in groups['master']
+
+- include_tasks: rancher-node.yml
+  when: inventory_hostname in groups['nodes']
