@@ -1,0 +1,23 @@
+---
+- name: Configure the EPEL repo
+  yum:
+    name: epel-release
+    state: present
+
+- name: Install nfs-utils package.
+  yum:
+    name: nfs-utils
+    state: present
+
+- name: Install python-pip
+  yum:
+    name: python-pip
+    state: present
+
+- name: Install docker-py
+  pip:
+    name: docker-py
+
+- name: Install jinja2
+  pip:
+    name: Jinja2
