@@ -1,0 +1,30 @@
+---
+- name: Check if ONAP project exists
+  uri:
+    method: GET
+    status_code: 200
+    url: "{{ rancher_server_url }}/v2-beta/projects?name=ONAP"
+  register: onap_env
+
+#- debug:
+#    var: onap_env.json.data
+
+- name: Add Kubernetes environment to Rancher
+  block:
+
+    - uri:
+        url: "{{ rancher_server_url }}/v2-beta/projectTemplates?name=kubernetes"
+        return_content: yes
+      register: kubernetes_template_id
+
+    - uri:
+        url: "{{ rancher_server_url }}/v2-beta/projects"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+          Accept: "application/json"
+        body_format: json
+        body: "{\"description\":\"k8s ONAP\", \"name\":\"ONAP\", \"projectTemplateId\":\"{{ kubernetes_template_id.json.data[0].id }}\", \"allowSystemRole\":false, \"members\":[], \"virtualMachine\":false, \"servicesPortRange\":null}"
+        return_content: yes
+        status_code: 201
+#  when: onap_env.json.data|list|length == 0 

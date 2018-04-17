@@ -1,0 +1,40 @@
+---
+- name: Check if helm is installed
+  stat:
+    path: /usr/local/bin/helm
+  changed_when: false
+  register: helm_bin_installed
+
+- when: not helm_bin_installed.stat.exists
+  block:
+    - name: Download helm
+      get_url:
+        url: https://storage.googleapis.com/kubernetes-helm/helm-v2.8.1-linux-amd64.tar.gz
+        dest: /tmp/helm-v2.8.1-linux-amd64.tar.gz
+        checksum: sha256:7df7e9eb1b7fde74cc9741682944e620793e618761ccfa8d4bfb355791b76f1d
+        mode: 0644
+
+    - name: Unarchive helm tgz
+      unarchive:
+        copy: no
+        src: /tmp/helm-v2.8.1-linux-amd64.tar.gz
+        dest: /tmp
+
+    - name: Copy helm binary to /usr/local/bin
+      copy:
+        src: /tmp/linux-amd64/helm 
+        dest: /usr/local/bin
+        owner: root
+        group: root
+        mode: 0755
+
+  always:
+    - name: Delete helm-v2.8.1-linux-amd64.tar.gz
+      file:
+        path: /tmp/helm-v2.8.1-linux-amd64.tar.gz
+        state: absent
+
+    - name: Delete helm-v2.8.1-linux-amd64 directory
+      file:
+        path: /tmp/linux-amd64
+        state: absent
