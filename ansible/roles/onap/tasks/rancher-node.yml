@@ -1,9 +1,55 @@
 ---
+- name: Determine if we're already running an agent
+  shell: "docker ps | fgrep -q rancher/agent"
+  register: agent_installed
+  ignore_errors: true
+  changed_when: false
+
+- name: Get ONAP env Id
+  uri:
+    method: GET
+    status_code: 200
+    url: "{{ rancher_server_url }}/v2-beta/projects?name=ONAP"
+  register: onap_env
+
+- debug:
+    var: onap_env.json.data[0]['id']
+
 - name: Get registration tokens
   uri: 
     method: GET 
     status_code: 200 
-    url: "http://10.0.2.15:8080/v2-beta/projects/1a5/registrationtokens"
-#    user: 450E14D8135D8C3348AE
-#    password: xRffuGrNvQDo3kiEr4Zo1Lj2A6pcJPyAarqXyDLr
+    url: "{{ rancher_server_url }}/v2-beta/projects/{{ onap_env.json.data[0]['id'] }}/registrationTokens/"
   register: registration_tokens
+  when: agent_installed|failed
+
+- name: register host (attempt one)
+  command: "{{ registration_tokens.json.data[0]['command']|replace('sudo ', '') }}"
+  register: registration_attempt_one
+  when: agent_installed|failed and
+        registration_tokens.json.data|list|length > 0
+
+- name: create registration url
+  uri: 
+    method: POST 
+    status_code: 201 
+    name: onap
+    url: "{{ rancher_server_url }}/v2-beta/projects/{{ onap_env.json.data[0]['id'] }}/registrationTokens/"
+  register: new_registration_token
+  when: agent_installed|failed and
+        registration_attempt_one|skipped
+  run_once: true
+
+- name: get registration tokens (again)
+  uri: 
+    method: GET 
+    status_code: 200 
+    url: "{{ rancher_server_url }}/v2-beta/projects/{{ onap_env.json.data[0]['id'] }}/registrationTokens/"
+  register: registration_tokens_again
+  when: agent_installed|failed and
+        registration_attempt_one|skipped
+
+- name: register host (attempt two)
+  command: "{{ registration_tokens_again.json.data[0]['command']|replace('sudo ', '') }}"
+  when: agent_installed|failed and
+        registration_attempt_one|skipped

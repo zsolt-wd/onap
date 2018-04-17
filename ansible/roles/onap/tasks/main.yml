@@ -1,8 +1,5 @@
 ---
-- name: Ensure nfs-utils package is installed.
-  yum:
-    name: nfs-utils
-    state: present
+- include_tasks: install-packages.yml
 
 - include_tasks: nfs-server.yml
   when: inventory_hostname in groups['master']
@@ -13,5 +10,14 @@
 - include_tasks: rancher-server.yml
   when: inventory_hostname in groups['master']
 
+- include_tasks: helm.yml
+  when: inventory_hostname in groups['master']
+
+- include_tasks: rancher-kubernetes.yml
+  when: inventory_hostname in groups['master']
+
 - include_tasks: rancher-node.yml
+  when: inventory_hostname in groups['nodes']
+
+- include_tasks: rancher-add_host.yml
   when: inventory_hostname in groups['nodes']

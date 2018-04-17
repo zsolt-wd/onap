@@ -1,19 +1,14 @@
 ---
-- name: Instal python-pip
-  yum:
-    name: python-pip
-    state: present
-
-- name: Install docker-py
-  pip:
-    name: docker-py
-
 - name: start rancher server
   docker_container:
     name: onap-rancher
     image: rancher/server
     state: started
-    restart: yes
+    restart: no
     ports:
-      - "8080:8080"
+      - "{{ rancher_server_port }}:{{ rancher_server_port }}"
 
+- name: wait for Rancher
+  wait_for:
+    host: "{{ rancher_server_ipv4 }}"
+    port: "{{ rancher_server_port }}"
