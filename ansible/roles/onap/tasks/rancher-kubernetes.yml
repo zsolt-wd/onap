@@ -6,8 +6,8 @@
     url: "{{ rancher_server_url }}/v2-beta/projects?name=ONAP"
   register: onap_env
 
-#- debug:
-#    var: onap_env.json.data
+- debug:
+    var: "{{ onap_env.json.data|list|length }}"
 
 - name: Add Kubernetes environment to Rancher
   block:
@@ -27,4 +27,4 @@
         body: "{\"description\":\"k8s ONAP\", \"name\":\"ONAP\", \"projectTemplateId\":\"{{ kubernetes_template_id.json.data[0].id }}\", \"allowSystemRole\":false, \"members\":[], \"virtualMachine\":false, \"servicesPortRange\":null}"
         return_content: yes
         status_code: 201
-#  when: onap_env.json.data|list|length == 0 
+  when: onap_env.json.data|list|length == 0 

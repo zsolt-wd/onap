@@ -1,2 +1,7 @@
 ---
+- name: Create Tiller service account
+  command: kubectl create -f {{ tillerserviceaccount.yml|quote }} 
+  register: tilleroutput
 
+- debug:
+    var: tilleroutput

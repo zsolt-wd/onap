@@ -15,6 +15,25 @@
         url: "{{ rancher_server_url }}/v2-beta/projects/{{ onap_env.json.data[0]['id'] }}/registrationTokens/"
       register: registration_tokens
 
-    - command: "docker run -e CATTLE_HOST_LABELS='onap=yes' --rm --privileged -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/rancher:/var/lib/rancher rancher/agent:v1.2.10 http://10.0.2.15:8080/v1/scripts/{{ registration_tokens.json.data[0]['token'] }}"
-      register: add_host_output
+- name: Create registration token
+  uri:
+    method: POST
+    status_code: 201
+    name: onap
+    url: "{{ rancher_server_url }}/v2-beta/projects/{{ onap_env.json.data[0]['id'] }}/registrationTokens/"
+  register: new_registration_token
+  when: registration_tokens.json.data|list|length == 0
+  run_once: true
+
+- name: Add host to infrastructure (second attempt)
+  block:
+    - uri:
+        method: GET
+        status_code: 200
+        url: "{{ rancher_server_url }}/v2-beta/projects/{{ onap_env.json.data[0]['id'] }}/registrationTokens/"
+      register: registration_tokens
+
+- name: Register worker node
+  command: "docker run -e CATTLE_HOST_LABELS='onap=yes' --rm --privileged -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/rancher:/var/lib/rancher rancher/agent:v1.2.10 http://10.0.2.15:8080/v1/scripts/{{ registration_tokens.json.data[0]['token'] }}"
+  register: add_host_output
   when: onap_env.json.data|list|length > 0

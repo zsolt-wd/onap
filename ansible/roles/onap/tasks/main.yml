@@ -11,7 +11,7 @@
   when: inventory_hostname in groups['master']
 
 - include_tasks: helm.yml
-  when: inventory_hostname in groups['master']
+  when: inventory_hostname in groups['nodes']
 
 - include_tasks: rancher-kubernetes.yml
   when: inventory_hostname in groups['master']
@@ -21,3 +21,6 @@
 
 - include_tasks: rancher-add_host.yml
   when: inventory_hostname in groups['nodes']
+
+- include_tasks: tiller.yml
+  when: inventory_hostname in groups['master']
