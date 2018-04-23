@@ -37,4 +37,4 @@
     - name: Delete helm-v2.8.1-linux-amd64 directory
       file:
         path: /root/linux-amd64
-       state: absent
+        state: absent

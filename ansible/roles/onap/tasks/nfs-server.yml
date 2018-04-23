@@ -5,18 +5,18 @@
     state: started
     enabled: yes
 
-- name: Enable firewalld
-  service:
-    name: firewalld
-    state: started
-    enabled: yes
-
-- name: configure firewall to allow nfs traffic
-  firewalld:
-    service: nfs
-    permanent: true
-    state: enabled
-  notify: restart firewalld
+#- name: Enable firewalld
+#  service:
+#    name: firewalld
+#    state: started
+#    enabled: yes
+#
+#- name: configure firewall to allow nfs traffic
+#  firewalld:
+#    service: nfs
+#    permanent: true
+#    state: enabled
+#  notify: restart firewalld
 
 - name: Enable nfs-server
   service:

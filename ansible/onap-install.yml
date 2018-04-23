@@ -1,4 +1,10 @@
 ---
 - hosts: master nodes
   roles:
+#    - role: 'lvm'
     - role: 'onap'
+  environment:
+    http_proxy: http://www-proxy.ericsson.se:8080
+    https_proxy: http://www-proxy.ericsson.se:8080
+    ftp_proxy: http://www-proxy.ericsson.se:8080
+    no_proxy: 172.29.222.176,172.29.241.163,172.29.241.176
