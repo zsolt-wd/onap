@@ -1,0 +1,53 @@
+---
+- name: creating new LVM volume group(s)
+  lvg:
+    vg: "{{ item['vgname'] }}"
+    pvs: "{{ item['disks']|join(',') }}"
+    state: "present"
+  with_items: "{{ lvm_groups }}"
+
+- name: creating new LVM logical volume(s)
+  lvol:
+    vg: "{{ item[0]['vgname'] }}"
+    lv: "{{ item[1]['lvname'] }}"
+    size: "{{ item[1]['size'] }}"
+    shrink: no
+    state: "present"
+  register: lvm
+  with_subelements:
+    - "{{ lvm_groups }}"
+    - lvnames
+
+- name: creating new filesystem on new LVM logical volume(s)
+  filesystem:
+    fstype: "{{ item[1]['filesystem'] }}"
+    dev: "/dev/{{ item[0]['vgname'] }}/{{ item[1]['lvname'] }}"
+    resizefs: yes
+  with_subelements:
+    - "{{ lvm_groups }}"
+    - lvnames
+
+- name: mounting filesystem(s)
+  mount:
+    path: "{{ item[1]['mntp'] }}"
+    src: "/dev/{{ item[0]['vgname'] }}/{{ item[1]['lvname'] }}"
+    fstype: "{{ item[1]['filesystem'] }}"
+    opts: "{{ item[1]['mopts']['opts'] | default('defaults') }}"
+    dump: "{{ item[1]['mopts']['dump'] | default('0') }}"
+    passno: "{{ item[1]['mopts']['passno'] | default('0') }}"
+    state: mounted
+  with_subelements:
+    - "{{ lvm_groups }}"
+    - lvnames
+  when:
+    - item[1]['mount']
+    - item[1]['filesystem'] == "ext4"
+
+- name: create and mount swap
+  shell: "swapoff -a && mkswap /dev/{{ item[0]['vgname'] }}/{{ item[1]['lvname'] }} && swapon -va"
+  with_subelements:
+    - "{{ lvm_groups }}"
+    - lvnames
+  when:
+    - item[1]['filesystem'] == "swap"
+    - lvm['changed']
