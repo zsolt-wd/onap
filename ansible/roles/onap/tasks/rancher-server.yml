@@ -2,13 +2,15 @@
 - name: start rancher server
   docker_container:
     name: onap-rancher
-    image: rancher/server
+    image: rancher/server:v1.6.17
     state: started
     restart: no
     ports:
-      - "{{ rancher_server_port }}:{{ rancher_server_port }}"
+      - "{{ rancher_server_exposed_port }}:{{ rancher_server_port }}"
+    exposed_ports:
+      - "{{ rancher_server_exposed_port }}"
 
 - name: wait for Rancher
   wait_for:
     host: "{{ rancher_server_ipv4 }}"
-    port: "{{ rancher_server_port }}"
+    port: "{{ rancher_server_exposed_port }}"

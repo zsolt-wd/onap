@@ -11,6 +11,7 @@ nfs_mount:
   fstype: "nfs"
 
 rancher_server_ipv4: "{{ hostvars[groups['master'][0]]['ansible_default_ipv4']['address'] }}"
+rancher_server_exposed_port: 9706
 rancher_server_port: 8080
-rancher_server_url: "http://{{ rancher_server_ipv4 }}:{{ rancher_server_port }}"
+rancher_server_url: "http://{{ rancher_server_ipv4 }}:{{ rancher_server_exposed_port }}"
 rancher_env: "1a5"

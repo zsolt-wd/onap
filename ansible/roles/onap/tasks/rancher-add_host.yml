@@ -1,9 +1,9 @@
 ---
-- name: Get ONAP env Id
+- name: Get onap env Id
   uri:
     method: GET
     status_code: 200
-    url: "{{ rancher_server_url }}/v2-beta/projects?name=ONAP"
+    url: "{{ rancher_server_url }}/v2-beta/projects?name=onap"
   register: onap_env
 
 

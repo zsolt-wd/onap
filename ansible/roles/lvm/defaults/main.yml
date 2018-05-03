@@ -15,15 +15,6 @@ lvm_groups:
           opts: defaults
           dump: 0
           passno: 0
-      - lvname: rootlv
-        size: 40g
-        filesystem: ext4
-        mount: true
-        mntp: /
-        mopts:
-          opts: defaults
-          dump: 1
-          passno: 1
       - lvname: tmplv
         size: 1g
         filesystem: ext4
@@ -34,7 +25,7 @@ lvm_groups:
           dump: 1
           passno: 2
       - lvname: varlv
-        size: 20g
+        size: 40g
         filesystem: ext4
         mount: true
         mntp: /var

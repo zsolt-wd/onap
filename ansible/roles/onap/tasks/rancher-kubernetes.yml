@@ -1,9 +1,9 @@
 ---
-- name: Check if ONAP project exists
+- name: Check if onap project exists
   uri:
     method: GET
     status_code: 200
-    url: "{{ rancher_server_url }}/v2-beta/projects?name=ONAP"
+    url: "{{ rancher_server_url }}/v2-beta/projects?name=onap"
   register: onap_env
 
 - debug:
@@ -24,7 +24,7 @@
           Content-Type: "application/json"
           Accept: "application/json"
         body_format: json
-        body: "{\"description\":\"k8s ONAP\", \"name\":\"ONAP\", \"projectTemplateId\":\"{{ kubernetes_template_id.json.data[0].id }}\", \"allowSystemRole\":false, \"members\":[], \"virtualMachine\":false, \"servicesPortRange\":null}"
+        body: "{\"description\":\"k8s onap\", \"name\":\"onap\", \"projectTemplateId\":\"{{ kubernetes_template_id.json.data[0].id }}\", \"allowSystemRole\":false, \"members\":[], \"virtualMachine\":false, \"servicesPortRange\":null}"
         return_content: yes
         status_code: 201
   when: onap_env.json.data|list|length == 0 
