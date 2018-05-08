@@ -3,6 +3,7 @@
   docker_container:
     name: onap-rancher
     image: rancher/server:v1.6.17
+    volumes: /var/lib/rancher-db:/var/lib/mysql
     state: started
     restart: no
     ports:
